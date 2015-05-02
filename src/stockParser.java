@@ -1,3 +1,4 @@
+import jdk.internal.util.xml.impl.Input;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -5,8 +6,10 @@ import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,7 +31,7 @@ public class stockParser {
         String ticker = input.toUpperCase();
         Stock stock = new Stock();
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar t = Calendar.getInstance();
         Date today = t.getTime();
         Calendar ly = Calendar.getInstance();
@@ -43,7 +46,16 @@ public class stockParser {
         String fullUrlStr = baseUrl + URLEncoder.encode(hquery, "UTF-8") + "&diagnostics=true&env=store://datatables.org/alltableswithkeys&format=json";
 
         URL fullUrl = new URL(fullUrlStr);
-        InputStream inputStream = fullUrl.openStream();
+        InputStream inputStream = null;
+        try {
+            inputStream = fullUrl.openStream();
+        } catch (ConnectException ce) {
+            System.out.println("Connection timed out. Exiting");
+            System.exit(-1);
+        } catch (UnknownHostException uhe) {
+            System.out.println("Connection offline. Try again later");
+            System.exit(-1);
+        }
 
         JSONTokener tok = new JSONTokener(inputStream);
         JSONObject result = new JSONObject(tok);
@@ -51,14 +63,13 @@ public class stockParser {
 
         //parse it
         JSONObject query = result.getJSONObject("query");
-        JSONObject r = query.getJSONObject("results");
-        JSONArray quotes = null;
+        JSONObject r;
         try {
-            quotes = r.getJSONArray("quote");
+            r = query.getJSONObject("results");
         } catch (JSONException je) {
-            System.out.println("Ticker not found");
             return null;
         }
+        JSONArray quotes = r.getJSONArray("quote");
         for (int i = 0; i < quotes.length(); i++) {
             JSONObject quote = quotes.getJSONObject(i);
             Double price = quote.getDouble("Close");
@@ -82,7 +93,11 @@ public class stockParser {
 
         //treat closing price as "price"
         stock.symbol = currentQuote.getString("symbol");
-        stock.price = currentQuote.getDouble("LastTradePriceOnly");
+        try {
+            stock.price = currentQuote.getDouble("LastTradePriceOnly");
+        } catch (JSONException je) {
+            return null;
+        }
 
 
         return stock;

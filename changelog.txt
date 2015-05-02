@@ -1,0 +1,9 @@
+05/02/15
+v0.0.2 
+- Bug fixing on parser
+- Implemented 30/60/120 DMA and help context menus
+
+04/30/15
+v0.0.1 
+- Initial version, show stock price and daily/weekly/monthly changes
+

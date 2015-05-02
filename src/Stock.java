@@ -21,19 +21,19 @@ public class Stock {
     }
 
     private double getDailyChange() {
-        Double dailyChange = (price-historicalPrice.get(1))/historicalPrice.get(1);
+        Double dailyChange = 100*((price-historicalPrice.get(1))/(historicalPrice.get(1)));
         return dailyChange;
     }
 
     private double getWeeklyChange() {
         //where 1 week is defined as 5 trading days
-        Double weeklyChange = (price-historicalPrice.get(5))/historicalPrice.get(5);
+        Double weeklyChange = 100*((price-historicalPrice.get(5))/historicalPrice.get(5));
         return weeklyChange;
     }
 
     private double getMonthlyChange() {
         //where 1 month is defined as 22 trading days
-        Double monthlyChange = (price-historicalPrice.get(22))/historicalPrice.get(22);
+        Double monthlyChange = 100*((price-historicalPrice.get(22))/historicalPrice.get(22));
         return monthlyChange;
     }
 
