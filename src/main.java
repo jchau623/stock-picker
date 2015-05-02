@@ -31,8 +31,13 @@ public class main {
                 File NASDAQ = new File("NASDAQ.txt");
                 DMA crossoverDMA = new DMA();
                 ArrayList<Stock> stockList = crossoverDMA.crossover30And120(NASDAQ);
-                for (int i = 0; i < stockList.size(); i++) {
-                    stockList.get(i).printInfo();
+                try {
+                    for (int i = 0; i < stockList.size(); i++) {
+                        stockList.get(i).printInfo();
+                    }
+                } catch (NullPointerException e){
+                    System.out.println("Please update NASDAQ.txt first");
+                    continue;
                 }
             }
             else if (input.equals("exit")) {

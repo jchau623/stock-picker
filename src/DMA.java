@@ -114,7 +114,6 @@ public class DMA {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Please update NASDAQ.txt first");
             return null;
         } catch (IOException e) {
             e.printStackTrace();
