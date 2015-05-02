@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://Z:/YahooFinanceAPI-1.3.0.jar!/" />
+          <root url="jar://Z:/Downloads/org.json-20120521.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
