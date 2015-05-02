@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Justin on 5/1/2015.
@@ -24,14 +24,16 @@ public class stockParser {
      * @version 1.0
      * @since 2015-05-01
      */
-    private static Stock readJSONHistorical(String input) throws IOException, JSONException {
+    public static Stock readJSONHistorical(String input) throws IOException, JSONException {
         String ticker = input.toUpperCase();
         Stock stock = new Stock();
 
-        DateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-        Calendar today = Calendar.getInstance();
-        Calendar lastYear = Calendar.getInstance();
-        lastYear.add(Calendar.YEAR, 1);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+        Calendar t = Calendar.getInstance();
+        Date today = t.getTime();
+        Calendar ly = Calendar.getInstance();
+        ly.add(Calendar.YEAR, -1);
+        Date lastYear = ly.getTime();
 
         //historical:
         //block taken from Nathaniel Waisbrot, http://stackoverflow.com/questions/17494758/how-to-implement-yql-in-java/17495491#17495491
@@ -74,12 +76,14 @@ public class stockParser {
         JSONObject currentResult = new JSONObject(tok2);
         inputStream1.close();
 
-        JSONObject currentResults = currentResult.getJSONObject("results");
+        JSONObject currentQuery = currentResult.getJSONObject("query");
+        JSONObject currentResults = currentQuery.getJSONObject("results");
         JSONObject currentQuote = currentResults.getJSONObject("quote");
 
         //treat closing price as "price"
         stock.symbol = currentQuote.getString("symbol");
         stock.price = currentQuote.getDouble("LastTradePriceOnly");
+
 
         return stock;
     }
