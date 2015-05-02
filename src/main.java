@@ -1,8 +1,8 @@
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
@@ -15,12 +15,25 @@ public class main {
         //System.out.println("Enter ticker symbol below, or type \"update\" to update the list of valid NASDAQ tickers.");
         Scanner scanner = new Scanner(System.in);
         while(true){
-            System.out.println("Enter ticker symbol below, or type \"update\" to update the list of valid NASDAQ tickers. Type exit to quit.");
+            System.out.println("Enter ticker symbol below, or type \"update\" to update the list of valid NASDAQ tickers. Type help for additional commands.");
             String input = scanner.nextLine();
+            if (input.equals("help")) {
+                System.out.println("Additional commands:");
+                System.out.println("input - description");
+                System.out.println("(1). crossover - Recommends stocks that satisfy the Moving Average Crossover condition");
+                continue;
+            }
             if (input.equals("update")) {
                 System.out.println("Updating list...");
                 updateNASDAQList();
                 System.out.println("List updated.");
+            } else if (input.equals("crossover")) {
+                File NASDAQ = new File("NASDAQ.txt");
+                DMA crossoverDMA = new DMA();
+                ArrayList<Stock> stockList = crossoverDMA.crossover30And120(NASDAQ);
+                for (int i = 0; i < stockList.size(); i++) {
+                    stockList.get(i).printInfo();
+                }
             }
             else if (input.equals("exit")) {
                 System.exit(0);
@@ -91,11 +104,6 @@ public class main {
                 }
             }
         }
-
-
-
-        //File NASDAQ = new File("NASDAQ.txt");
-        //getData(NASDAQ);
     }
 
     private static void updateNASDAQList() throws IOException {
@@ -103,7 +111,5 @@ public class main {
         updateList.updateLocalFile();
     }
 
-    private static void getData(File list) {
 
-    }
 }

@@ -11,6 +11,10 @@ public class Stock {
     ArrayList<Double> historicalPrice = new ArrayList<Double>();
     ArrayList<Integer> historicalVolume = new ArrayList<Integer>();
 
+    public void printTicker() {
+        System.out.println(symbol);
+    }
+
     public void printInfo() {
         DecimalFormat twodp = new DecimalFormat("#.00");
         System.out.println("Ticker: " + symbol);
@@ -18,6 +22,7 @@ public class Stock {
         System.out.println("Daily Change: " + twodp.format(getDailyChange()) + "%");
         System.out.println("Weekly Change: " + twodp.format(getWeeklyChange()) + "%");
         System.out.println("Monthly Change: " + twodp.format(getMonthlyChange()) + "%");
+        System.out.println();
     }
 
     private double getDailyChange() {
