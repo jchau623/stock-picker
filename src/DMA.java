@@ -95,13 +95,19 @@ public class DMA {
     public ArrayList<Stock> crossover30And120(File list) {
         ArrayList<Stock> stocks = new ArrayList<Stock>();
         try (BufferedReader br = new BufferedReader(new FileReader(list))){
+            Stock stock;
+            stockParser sp = new stockParser();
             for(String line; (line = br.readLine()) != null; ) {
-                stockParser sp = new stockParser();
-                Stock stock;
                 try {
+
+                    //stocks is the critical part, it will be shared between concurrent threads
+                    //should I put all stocks in a BlockingQueue first?
                     stock = sp.readJSONHistorical(line);
+
+                    //calculateWeek30 and calculateWeek120 can be done concurrently
                     Double[] sevenThirty = calculateWeek30(stock.historicalPrice);
                     Double[] oneTwentyThirty = calculateWeek120(stock.historicalPrice);
+
                     if (crossoverChecker(sevenThirty, oneTwentyThirty)) {
                         stocks.add(stock);
                     }

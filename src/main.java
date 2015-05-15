@@ -21,6 +21,7 @@ public class main {
                 System.out.println("Additional commands:");
                 System.out.println("input - description");
                 System.out.println("(1). crossover - Recommends stocks that satisfy the Moving Average Crossover condition");
+                System.out.println("(0). exit - Exit program");
                 continue;
             }
             if (input.equals("update")) {
