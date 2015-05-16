@@ -3,11 +3,23 @@ import org.json.JSONException;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Justin on 5/1/2015.
  */
-public class DMA {
+public class DMA implements Runnable{
+    private BlockingQueue<String> bq;
+    private ArrayList<Stock> stocks;
+
+    public DMA(BlockingQueue<String> listofStocks) {
+        bq = listofStocks;
+    }
+
+    public DMA() {
+
+    }
+
     public double calculate30(ArrayList<Double> historicalPrice) {
         Double accumulatingTotal = 0.00;
         try {
@@ -89,42 +101,21 @@ public class DMA {
      *
      * A few lines were taken from http://stackoverflow.com/questions/5868369/how-to-read-a-large-text-file-line-by-line-using-java
      *
-     * @param list  list of symbols
+     * @param   symbol
      * @since 2015-05-02
      */
-    public ArrayList<Stock> crossover30And120(File list) {
-        ArrayList<Stock> stocks = new ArrayList<Stock>();
-        try (BufferedReader br = new BufferedReader(new FileReader(list))){
+    public void crossover30And120(String symbol) throws IOException, JSONException {
             Stock stock;
             stockParser sp = new stockParser();
-            for(String line; (line = br.readLine()) != null; ) {
-                try {
-
-                    //stocks is the critical part, it will be shared between concurrent threads
-                    //should I put all stocks in a BlockingQueue first?
-                    stock = sp.readJSONHistorical(line);
-
-                    //calculateWeek30 and calculateWeek120 can be done concurrently
-                    Double[] sevenThirty = calculateWeek30(stock.historicalPrice);
-                    Double[] oneTwentyThirty = calculateWeek120(stock.historicalPrice);
-
-                    if (crossoverChecker(sevenThirty, oneTwentyThirty)) {
-                        stocks.add(stock);
-                    }
-                } catch (JSONException e) {
-                    continue;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException e) {
-                    continue;
-                }
-            }
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
+        System.out.println("ANALYZED " + symbol);
+        stock = sp.readJSONHistorical(symbol);
+        //calculateWeek30 and calculateWeek120 can be done concurrently
+        Double[] sevenThirty = calculateWeek30(stock.historicalPrice);
+        Double[] oneTwentyThirty = calculateWeek120(stock.historicalPrice);
+        if (crossoverChecker(sevenThirty, oneTwentyThirty)) {
+            stocks.add(stock);
         }
-        return stocks;
+
     }
 
     //thirty[4,5,6] MUST be greater than oneTwenty[4,5,6]
@@ -167,5 +158,22 @@ public class DMA {
 
     }
 
+    public ArrayList<Stock> getStocks() {
+        return stocks;
+    }
 
+    @Override
+    public void run() {
+        while(true) {
+            try {
+                crossover30And120(bq.take());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

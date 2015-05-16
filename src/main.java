@@ -2,9 +2,9 @@ import org.json.JSONException;
 
 import java.io.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Scanner;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Justin on 4/30/2015.
@@ -30,15 +30,19 @@ public class main {
                 System.out.println("List updated.");
             } else if (input.equals("crossover")) {
                 File NASDAQ = new File("NASDAQ.txt");
-                DMA crossoverDMA = new DMA();
-                ArrayList<Stock> stockList = crossoverDMA.crossover30And120(NASDAQ);
-                try {
-                    for (int i = 0; i < stockList.size(); i++) {
-                        stockList.get(i).printInfo();
+                BlockingQueue listofStocks = new ArrayBlockingQueue(1024);
+                listPopulator listPopulator = new listPopulator(listofStocks, NASDAQ);
+                DMA[] DMAs = new DMA[3];
+                for (int i = 0; i < 3; i++) {
+                    DMAs[i] = new DMA(listofStocks);
+                    new Thread(DMAs[i]).start();
+                }
+                new Thread(listPopulator).start();
+
+                for (int i = 0; i < DMAs.length; i++) {
+                    for (int p = 0; p < DMAs[i].getStocks().size(); p++) {
+                        DMAs[i].getStocks().get(p).printInfo();
                     }
-                } catch (NullPointerException e){
-                    System.out.println("Please update NASDAQ.txt first");
-                    continue;
                 }
             }
             else if (input.equals("exit")) {
