@@ -2,6 +2,7 @@ import org.json.JSONException;
 
 import java.io.*;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -10,9 +11,10 @@ import java.util.concurrent.BlockingQueue;
  * Created by Justin on 4/30/2015.
  */
 public class main {
-    public static void main (String[] args) throws IOException, JSONException {
-        System.out.println("stock-picker written by Justin Chau, v0.0.2");
-        //System.out.println("Enter ticker symbol below, or type \"update\" to update the list of valid NASDAQ tickers.");
+    public static void main (String[] args) throws IOException, JSONException, InterruptedException {
+        System.out.println("stock-picker written by Justin Chau, v0.0.3");
+        Date date = new Date();
+        System.out.println(date.toString());
         Scanner scanner = new Scanner(System.in);
         while(true){
             System.out.println("Enter ticker symbol below, or type \"update\" to update the list of valid NASDAQ tickers. Type help for additional commands.");
@@ -33,17 +35,26 @@ public class main {
                 BlockingQueue listofStocks = new ArrayBlockingQueue(1024);
                 listPopulator listPopulator = new listPopulator(listofStocks, NASDAQ);
                 DMA[] DMAs = new DMA[3];
-                for (int i = 0; i < 3; i++) {
+                Thread[] DMAThreads = new Thread[DMAs.length];
+                for (int i = 0; i < DMAs.length; i++) {
                     DMAs[i] = new DMA(listofStocks);
-                    new Thread(DMAs[i]).start();
+                    DMAThreads[i] = new Thread(DMAs[i]);
+                    DMAThreads[i].start();
                 }
-                new Thread(listPopulator).start();
+                Thread lpThread = new Thread(listPopulator);
+                lpThread.start();
+
+                lpThread.join();
+                for (int i = 0; i < DMAs.length; i++) {
+                    DMAThreads[i].join();
+                }
 
                 for (int i = 0; i < DMAs.length; i++) {
                     for (int p = 0; p < DMAs[i].getStocks().size(); p++) {
                         DMAs[i].getStocks().get(p).printInfo();
                     }
                 }
+                System.out.println(date.toString());
             }
             else if (input.equals("exit")) {
                 System.exit(0);

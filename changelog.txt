@@ -1,3 +1,14 @@
+05/16/15
+v0.0.3
+- Refactored code and crossover search parallelized
+- TODO: implement other stock patterns
+- TODO: GUI?
+
+05/03/15
+v0.0.3a
+- 30/120 DMA crossover search implemented
+- TODO: implement concurrency
+
 05/02/15
 v0.0.2 
 - Bug fixing on parser

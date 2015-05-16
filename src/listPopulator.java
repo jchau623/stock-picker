@@ -19,7 +19,6 @@ public class listPopulator implements Runnable {
             try (BufferedReader br = new BufferedReader(new FileReader(NASDAQ))) {
                 for (String line; (line = br.readLine()) != null;) {
                     bq.put(line);
-                    System.out.println("Added " + line);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

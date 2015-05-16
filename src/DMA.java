@@ -1,7 +1,6 @@
 import org.json.JSONException;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,6 +13,7 @@ public class DMA implements Runnable{
 
     public DMA(BlockingQueue<String> listofStocks) {
         bq = listofStocks;
+        stocks = new ArrayList<Stock>();
     }
 
     public DMA() {
@@ -77,7 +77,7 @@ public class DMA implements Runnable{
         return accumulatingTotals;
     }
 
-    public Double[] calculateWeek120(ArrayList<Double> historicalPrice) {
+    public Double[] calculate12030(ArrayList<Double> historicalPrice) {
         Double[] accumulatingTotals = new Double[7];
         try {
             for (int i = 0; i < 7; i++) {
@@ -107,13 +107,20 @@ public class DMA implements Runnable{
     public void crossover30And120(String symbol) throws IOException, JSONException {
             Stock stock;
             stockParser sp = new stockParser();
-        System.out.println("ANALYZED " + symbol);
         stock = sp.readJSONHistorical(symbol);
-        //calculateWeek30 and calculateWeek120 can be done concurrently
-        Double[] sevenThirty = calculateWeek30(stock.historicalPrice);
-        Double[] oneTwentyThirty = calculateWeek120(stock.historicalPrice);
-        if (crossoverChecker(sevenThirty, oneTwentyThirty)) {
-            stocks.add(stock);
+        //calculateWeek30 and calculate12030 can be done concurrently
+        Double[] sevenThirty = null;
+        Double[] oneTwentyThirty = null;
+        if (stock != null) {
+            if (stock.historicalPrice != null) {
+                sevenThirty = calculateWeek30(stock.historicalPrice);
+                oneTwentyThirty = calculate12030(stock.historicalPrice);
+            }
+            if (sevenThirty != null && oneTwentyThirty != null) {
+                if (crossoverChecker(sevenThirty, oneTwentyThirty)) {
+                    stocks.add(stock);
+                }
+            }
         }
 
     }
@@ -164,16 +171,22 @@ public class DMA implements Runnable{
 
     @Override
     public void run() {
-        while(true) {
-            try {
-                crossover30And120(bq.take());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            Thread.sleep(250);
+            while (!bq.isEmpty()) {
+                try {
+                    crossover30And120(bq.take());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    continue;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
