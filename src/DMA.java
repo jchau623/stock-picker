@@ -179,7 +179,7 @@ public class DMA implements Runnable{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     continue;
                 } catch (IOException e) {
                     e.printStackTrace();

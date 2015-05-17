@@ -34,7 +34,7 @@ public class main {
                 File NASDAQ = new File("NASDAQ.txt");
                 BlockingQueue listofStocks = new ArrayBlockingQueue(1024);
                 listPopulator listPopulator = new listPopulator(listofStocks, NASDAQ);
-                DMA[] DMAs = new DMA[3];
+                DMA[] DMAs = new DMA[25];
                 Thread[] DMAThreads = new Thread[DMAs.length];
                 for (int i = 0; i < DMAs.length; i++) {
                     DMAs[i] = new DMA(listofStocks);
@@ -54,7 +54,8 @@ public class main {
                         DMAs[i].getStocks().get(p).printInfo();
                     }
                 }
-                System.out.println(date.toString());
+                Date date2 = new Date();
+                System.out.println(date2.toString());
             }
             else if (input.equals("exit")) {
                 System.exit(0);

@@ -1,6 +1,7 @@
 05/16/15
 v0.0.3
 - Refactored code and crossover search parallelized
+- Crossover performance increased 30 times (150 minutes -> 5 minutes) though performance will vary between different computers and different network speeds
 - TODO: implement other stock patterns
 - TODO: GUI?
 

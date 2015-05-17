@@ -26,6 +26,5 @@ public class listPopulator implements Runnable {
         } catch (InterruptedException e) {
                 e.printStackTrace();
         }
-        System.out.println("*** DONE LIST POPULATOR ***");
     }
 }
